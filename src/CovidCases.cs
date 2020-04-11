@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConsoleCovidExplorer
 {
-    class Program
+    class CovidCases
     {
         private static string CachedETagValue
         {
