@@ -22,9 +22,9 @@ namespace ConsoleCovidExplorer
             }
         }
 
-        private static string GetPublishedData(string uri)
+        private static string GetPublishedData(string uri, string fileName)
         {
-            var path = $@"{projectPath}CoronaVirusData.csv";
+            var path = $@"{projectPath}{fileName}";
             Uri NYTimesUri = new Uri(uri);
 
             string eTag = CachedETagValue;
@@ -83,6 +83,7 @@ namespace ConsoleCovidExplorer
 
         static List<DataPoint> dataPoints = new List<DataPoint>();
         static string projectPath = string.Empty;
+        static string cacheFileName = string.Empty;
         static string sourceDataUri = string.Empty;
         static string[] statesToQuery = { "Kansas" };
 
@@ -103,7 +104,8 @@ namespace ConsoleCovidExplorer
             }
 
             sourceDataUri = config["userPrefs:remoteDataSource"];
-            string dataFilePath = GetPublishedData(sourceDataUri);
+            cacheFileName = config["userPrefs:outputFileName"];
+            string dataFilePath = GetPublishedData(sourceDataUri,cacheFileName);
 
             Console.WriteLine($"Cached data file date = {new FileInfo(dataFilePath).LastAccessTime}");
             var lines = File.ReadAllLines(dataFilePath);
