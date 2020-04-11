@@ -198,11 +198,11 @@ namespace ConsoleCovidExplorer
                 .GroupBy(d => new { d.State, d.County })
                 .Select(d => d.OrderByDescending(x => x.Date).First());
 
-            System.Console.WriteLine($"{"Date",-12} {"State",-40} {"County",-40} {"Cases",-20} {"Deaths",-20}");
+            System.Console.WriteLine($"{"Date",-12} {"State",-40} {"County",-40} {"Cases",20} {"Deaths",20}");
             System.Console.WriteLine($"{Dashes(12)} {Dashes(40)} {Dashes(40)} {Dashes(20)} {Dashes(20)}");
             foreach (var r in localData.OrderByDescending(rr => rr.Cases).ThenBy(rr => rr.State).ThenBy(rr => rr.County))
             {
-                System.Console.WriteLine($"{r.Date,-12:MM/dd/yy} {r.State,-40} {r.County,-40} {r.Cases,-20} {r.Deaths,-20}");
+                System.Console.WriteLine($"{r.Date,-12:MM/dd/yy} {r.State,-40} {r.County,-40} {r.Cases,20:#,##0} {r.Deaths,20:#,##0}");
             }
             #endregion
 
