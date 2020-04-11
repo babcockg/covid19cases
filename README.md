@@ -1,6 +1,7 @@
 # covid19cases
 Explore NY Times covid cases data
 
+<b>Requirements</b>
 Visual Studio Code console project<br/>
     https://code.visualstudio.com/download<br/>
 
