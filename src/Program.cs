@@ -148,13 +148,10 @@ namespace ConsoleCovidExplorer
             #region filter data by state if states are contained in appsettings.json
             try
             {
-                var stateFilter = config.GetSection("userPrefs:stateFilter").Get<string[]>();
-                if (stateFilter != null)
+                stateFilter = config.GetSection("userPrefs:stateFilter").Get<string[]>();
+                if (stateFilter != null && stateFilter.Any())
                 {
-                    if (stateFilter.Any())
-                    {
-                        queryPoints = dataPoints.Where(d => stateFilter.Contains(d.State, StringComparer.OrdinalIgnoreCase)).ToList<DataPoint>();
-                    }
+                    queryPoints = dataPoints.Where(d => stateFilter.Contains(d.State, StringComparer.OrdinalIgnoreCase)).ToList<DataPoint>();
                 }
                 else
                 {
@@ -184,6 +181,7 @@ namespace ConsoleCovidExplorer
         static string dataFilePath = string.Empty;
         static List<DataPoint> queryPoints = null;
         static IConfiguration config = null;
+        static string[] stateFilter = null;
 
         public static int Main(string[] args)
         {
@@ -192,6 +190,11 @@ namespace ConsoleCovidExplorer
             FetchData();
             FilterDataPoints();
 
+
+            if (stateFilter != null && stateFilter.Any())
+            {
+                System.Console.WriteLine($"States included: {string.Join(',', stateFilter)}");
+            }
 
             #region group data by state, county ... output the results
             var localData = queryPoints
