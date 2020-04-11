@@ -81,31 +81,21 @@ namespace ConsoleCovidExplorer
             return path;
         }
 
-        static List<DataPoint> dataPoints = new List<DataPoint>();
-
-        // appsettings.json - userPrefs:outputDirectory
-        static string projectPath = string.Empty;
-
-        // appsettings.json - userPrefs:outputFileName
-        static string cacheFileName = string.Empty;
-
-        // appsettings.json - userPrefs:remoteDataSource
-        static string sourceDataUri = string.Empty;
-
-        static string dataFilePath = string.Empty;
-
-        public static int Main(string[] args)
+        public static void CreateConfiguration()
         {
             #region create config from appsettings.json
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json");
 
-            IConfiguration config = new ConfigurationBuilder()
+            config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true, true)
                 .Build();
             #endregion
+        }
 
+        public static void ReadConfiguration()
+        {
             #region get values from config, fetch remote data into file
             projectPath = config["userPrefs:outputDirectory"];
             if (!Directory.Exists(projectPath))
@@ -116,7 +106,10 @@ namespace ConsoleCovidExplorer
             cacheFileName = config["userPrefs:outputFileName"];
             dataFilePath = GetPublishedData(sourceDataUri, cacheFileName);
             #endregion
+        }
 
+        public static void FetchData()
+        {
             #region output the status of the cache file
             Console.WriteLine($"Cached data file date = {new FileInfo(dataFilePath).LastAccessTime}");
             var lines = File.ReadAllLines(dataFilePath);
@@ -148,35 +141,77 @@ namespace ConsoleCovidExplorer
                 }
             }
             #endregion
+        }
 
+        public static void FilterDataPoints()
+        {
             #region filter data by state if states are contained in appsettings.json
-            List<DataPoint> queryPoints = null;
-            var stateFilter = config.GetSection("userPrefs:stateFilter").Get<string[]>();
-            if (stateFilter.Any())
+            try
             {
-                queryPoints = dataPoints.Where(d => stateFilter.Contains(d.State)).ToList<DataPoint>();
+                var stateFilter = config.GetSection("userPrefs:stateFilter").Get<string[]>();
+                if (stateFilter != null)
+                {
+                    if (stateFilter.Any())
+                    {
+                        queryPoints = dataPoints.Where(d => stateFilter.Contains(d.State, StringComparer.OrdinalIgnoreCase)).ToList<DataPoint>();
+                    }
+                }
+                else
+                {
+                    queryPoints = dataPoints;
+                }
             }
-            else
+            catch (Exception exc)
             {
-                queryPoints = dataPoints;
+                while (exc != null)
+                {
+                    System.Console.WriteLine($"{exc.GetType().Name} : {exc.Message}");
+                    exc = exc.InnerException;
+                }
             }
-            #endregion
 
-            #region group data by state, county ... output results
+            #endregion
+        }
+        public static string Dashes(int width, char pad = '-')
+        {
+            return new string(pad, width);
+        }
+
+        static List<DataPoint> dataPoints = new List<DataPoint>();
+        static string projectPath = string.Empty;
+        static string cacheFileName = string.Empty;
+        static string sourceDataUri = string.Empty;
+        static string dataFilePath = string.Empty;
+        static List<DataPoint> queryPoints = null;
+        static IConfiguration config = null;
+
+        public static int Main(string[] args)
+        {
+            CreateConfiguration();
+            ReadConfiguration();
+            FetchData();
+            FilterDataPoints();
+
+
+            #region group data by state, county ... output the results
             var localData = queryPoints
                 .GroupBy(d => new { d.State, d.County })
                 .Select(d => d.OrderByDescending(x => x.Date).First());
 
-
-            foreach (var r in localData.OrderBy(rr => rr.State).ThenByDescending(rr => rr.Cases))
+            System.Console.WriteLine($"{"Date",-12} {"State",-40} {"County",-40} {"Cases",-20} {"Deaths",-20}");
+            System.Console.WriteLine($"{Dashes(12)} {Dashes(40)} {Dashes(40)} {Dashes(20)} {Dashes(20)}");
+            foreach (var r in localData.OrderByDescending(rr => rr.Cases).ThenBy(rr => rr.State).ThenBy(rr => rr.County))
             {
                 System.Console.WriteLine($"{r.Date,-12:MM/dd/yy} {r.State,-40} {r.County,-40} {r.Cases,-20} {r.Deaths,-20}");
             }
             #endregion
 
             // Done!!
-            System.Console.Write($"Done. Press any key to continue.");
-            Console.Read();
+            if (!Console.IsOutputRedirected)
+            {
+                System.Console.Write($"Done. Press any key to continue.");
+                Console.Read();
+            }
 
             return 0;
 
