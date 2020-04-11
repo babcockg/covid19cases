@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace ConsoleCovidExplorer
 {
-    class Program
+    public static class CovidCases
     {
         private static string CachedETagValue
         {
@@ -148,13 +148,10 @@ namespace ConsoleCovidExplorer
             #region filter data by state if states are contained in appsettings.json
             try
             {
-                var stateFilter = config.GetSection("userPrefs:stateFilter").Get<string[]>();
-                if (stateFilter != null)
+                stateFilter = config.GetSection("userPrefs:stateFilter").Get<string[]>();
+                if (stateFilter != null && stateFilter.Any())
                 {
-                    if (stateFilter.Any())
-                    {
-                        queryPoints = dataPoints.Where(d => stateFilter.Contains(d.State, StringComparer.OrdinalIgnoreCase)).ToList<DataPoint>();
-                    }
+                    queryPoints = dataPoints.Where(d => stateFilter.Contains(d.State, StringComparer.OrdinalIgnoreCase)).ToList<DataPoint>();
                 }
                 else
                 {
@@ -184,6 +181,7 @@ namespace ConsoleCovidExplorer
         static string dataFilePath = string.Empty;
         static List<DataPoint> queryPoints = null;
         static IConfiguration config = null;
+        static string[] stateFilter = null;
 
         public static int Main(string[] args)
         {
@@ -193,16 +191,21 @@ namespace ConsoleCovidExplorer
             FilterDataPoints();
 
 
+            if (stateFilter != null && stateFilter.Any())
+            {
+                System.Console.WriteLine($"States included: {string.Join(',', stateFilter)}");
+            }
+
             #region group data by state, county ... output the results
             var localData = queryPoints
                 .GroupBy(d => new { d.State, d.County })
                 .Select(d => d.OrderByDescending(x => x.Date).First());
 
-            System.Console.WriteLine($"{"Date",-12} {"State",-40} {"County",-40} {"Cases",-20} {"Deaths",-20}");
+            System.Console.WriteLine($"{"Date",-12} {"State",-40} {"County",-40} {"Cases",20} {"Deaths",20}");
             System.Console.WriteLine($"{Dashes(12)} {Dashes(40)} {Dashes(40)} {Dashes(20)} {Dashes(20)}");
             foreach (var r in localData.OrderByDescending(rr => rr.Cases).ThenBy(rr => rr.State).ThenBy(rr => rr.County))
             {
-                System.Console.WriteLine($"{r.Date,-12:MM/dd/yy} {r.State,-40} {r.County,-40} {r.Cases,-20} {r.Deaths,-20}");
+                System.Console.WriteLine($"{r.Date,-12:MM/dd/yy} {r.State,-40} {r.County,-40} {r.Cases,20:#,##0} {r.Deaths,20:#,##0}");
             }
             #endregion
 
