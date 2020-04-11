@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Wcq+vod09/qqFucEWXPXZpKFwDYT6VPHhrlNTgIBwFiw0rr370SDtw6pv4AJ3l5m68bYNVxTgmVBh+y+gXakQA==",
+  "dgSpecHash": "Bdb03XNB110/+kVczPs0toh8Dzu5n6E3R1F8W4+KZsaRrJqsCC/MyZFArWKvx0ASZTJGZwNUozqMbA6pQmd7dg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\galen\\covid\\covid19cases\\ConsoleCovidExplorer.csproj",
+  "projectFilePath": "D:\\Users\\galen\\Documents\\covid19cases\\covidexplorer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\galen\\.nuget\\packages\\microsoft.extensions.configuration\\3.1.3\\microsoft.extensions.configuration.3.1.3.nupkg.sha512",
     "C:\\Users\\galen\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\3.1.3\\microsoft.extensions.configuration.abstractions.3.1.3.nupkg.sha512",

@@ -268,11 +268,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\galen\\covid\\covid19cases\\ConsoleCovidExplorer.csproj",
-      "projectName": "ConsoleCovidExplorer",
-      "projectPath": "C:\\Users\\galen\\covid\\covid19cases\\ConsoleCovidExplorer.csproj",
+      "projectUniqueName": "D:\\Users\\galen\\Documents\\covid19cases\\covidexplorer.csproj",
+      "projectName": "covidexplorer",
+      "projectPath": "D:\\Users\\galen\\Documents\\covid19cases\\covidexplorer.csproj",
       "packagesPath": "C:\\Users\\galen\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\galen\\covid\\covid19cases\\obj\\",
+      "outputPath": "D:\\Users\\galen\\Documents\\covid19cases\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\PROGRAM FILES\\DOTNET\\sdk\\NuGetFallbackFolder"
