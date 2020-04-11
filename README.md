@@ -1,5 +1,5 @@
 # covid19cases
-Explore NY Times covid cases data
+Explore NY Times #COVID19 cases data
 
 <b>Requirements</b><br/>
 Visual Studio Code console project<br/>
