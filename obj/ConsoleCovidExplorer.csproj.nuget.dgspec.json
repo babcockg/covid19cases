@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\galen\\ConsoleCovidExplorer\\ConsoleCovidExplorer.csproj": {}
+    "C:\\Users\\galen\\test\\covid19cases\\ConsoleCovidExplorer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\galen\\ConsoleCovidExplorer\\ConsoleCovidExplorer.csproj": {
+    "C:\\Users\\galen\\test\\covid19cases\\ConsoleCovidExplorer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\galen\\ConsoleCovidExplorer\\ConsoleCovidExplorer.csproj",
+        "projectUniqueName": "C:\\Users\\galen\\test\\covid19cases\\ConsoleCovidExplorer.csproj",
         "projectName": "ConsoleCovidExplorer",
-        "projectPath": "C:\\Users\\galen\\ConsoleCovidExplorer\\ConsoleCovidExplorer.csproj",
+        "projectPath": "C:\\Users\\galen\\test\\covid19cases\\ConsoleCovidExplorer.csproj",
         "packagesPath": "C:\\Users\\galen\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\galen\\ConsoleCovidExplorer\\obj\\",
+        "outputPath": "C:\\Users\\galen\\test\\covid19cases\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\PROGRAM FILES\\DOTNET\\sdk\\NuGetFallbackFolder"

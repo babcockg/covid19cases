@@ -153,6 +153,9 @@ namespace ConsoleCovidExplorer
                 System.Console.WriteLine($"{r.Date,-12:MM/dd/yy} {r.State,-40} {r.County,-40} {r.Cases,-20} {r.Deaths,-20}");
             }
 
+            System.Console.Write($"Done. Press any key to continue.");
+            Console.ReadKey(true);
+
             return 0;
 
 
