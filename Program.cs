@@ -82,13 +82,21 @@ namespace ConsoleCovidExplorer
         }
 
         static List<DataPoint> dataPoints = new List<DataPoint>();
+
+        // appsettings.json - userPrefs:outputDirectory
         static string projectPath = string.Empty;
+
+        // appsettings.json - userPrefs:outputFileName
         static string cacheFileName = string.Empty;
+
+        // appsettings.json - userPrefs:remoteDataSource
         static string sourceDataUri = string.Empty;
-        static string[] statesToQuery = { "Kansas" };
+
+        static string dataFilePath = string.Empty;
 
         public static int Main(string[] args)
         {
+            #region create config from appsettings.json
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json");
@@ -96,20 +104,25 @@ namespace ConsoleCovidExplorer
             IConfiguration config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true, true)
                 .Build();
+            #endregion
 
+            #region get values from config, fetch remote data into file
             projectPath = config["userPrefs:outputDirectory"];
             if (!Directory.Exists(projectPath))
             {
                 Directory.CreateDirectory(projectPath);
             }
-
             sourceDataUri = config["userPrefs:remoteDataSource"];
             cacheFileName = config["userPrefs:outputFileName"];
-            string dataFilePath = GetPublishedData(sourceDataUri,cacheFileName);
+            dataFilePath = GetPublishedData(sourceDataUri, cacheFileName);
+            #endregion
 
+            #region output the status of the cache file
             Console.WriteLine($"Cached data file date = {new FileInfo(dataFilePath).LastAccessTime}");
             var lines = File.ReadAllLines(dataFilePath);
+            #endregion
 
+            #region transform csv data into a List<DataPoint>
             foreach (var l in lines.Skip(1))
             {
                 var values = l.Split(new[] { ',' });
@@ -134,17 +147,22 @@ namespace ConsoleCovidExplorer
                     }
                 }
             }
+            #endregion
 
+            #region filter data by state if states are contained in appsettings.json
             List<DataPoint> queryPoints = null;
-            if (statesToQuery.Any())
+            var stateFilter = config.GetSection("userPrefs:stateFilter").Get<string[]>();
+            if (stateFilter.Any())
             {
-                queryPoints = dataPoints.Where(d => statesToQuery.Contains(d.State)).ToList<DataPoint>();
+                queryPoints = dataPoints.Where(d => stateFilter.Contains(d.State)).ToList<DataPoint>();
             }
             else
             {
                 queryPoints = dataPoints;
             }
+            #endregion
 
+            #region group data by state, county ... output results
             var localData = queryPoints
                 .GroupBy(d => new { d.State, d.County })
                 .Select(d => d.OrderByDescending(x => x.Date).First());
@@ -154,9 +172,11 @@ namespace ConsoleCovidExplorer
             {
                 System.Console.WriteLine($"{r.Date,-12:MM/dd/yy} {r.State,-40} {r.County,-40} {r.Cases,-20} {r.Deaths,-20}");
             }
+            #endregion
 
+            // Done!!
             System.Console.Write($"Done. Press any key to continue.");
-            Console.ReadKey(true);
+            Console.Read();
 
             return 0;
 
