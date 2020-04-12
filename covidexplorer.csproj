@@ -13,7 +13,7 @@
   </ItemGroup>
 
     <ItemGroup>
-        <None Include="src\appsettings.json" Link="appsettings.json" CopyToOutputDirectory="Always" />
+        <None Include="appsettings.json" Link="appsettings.json" CopyToOutputDirectory="Always" />
     </ItemGroup>
     
     
