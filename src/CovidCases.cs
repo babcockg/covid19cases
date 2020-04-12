@@ -170,6 +170,76 @@ namespace ConsoleCovidExplorer
             #endregion
         }
 
+        public static void DumpStateTotals()
+        {
+            totalPoints = new List<StateTotal>();
+
+            string currentState = string.Empty;
+            int totalCases = 0;
+            int totalDeaths = 0;
+
+            var localData = queryPoints
+                .GroupBy(d => new { d.State, d.County })
+                .Select(d => d.OrderByDescending(x => x.Date).First());
+
+            foreach (var r in localData.OrderBy(q => q.State))
+            {
+                // First row of data? Initialize currentState variable
+                if (string.IsNullOrEmpty(currentState))
+                {
+                    currentState = r.State;
+                }
+
+                if (!r.State.Equals(currentState))
+                {
+                    totalPoints.Add(new StateTotal
+                    {
+                        StateName = currentState,
+                        TotalCases = totalCases,
+                        TotalDeaths = totalDeaths
+                    });
+                    currentState = r.State;
+                    totalCases = 0;
+                    totalDeaths = 0;
+                }
+                totalCases += r.Cases;
+                totalDeaths += r.Deaths;
+            }
+            totalPoints.Add(new StateTotal
+            {
+                StateName = currentState,
+                TotalCases = totalCases,
+                TotalDeaths = totalDeaths
+            });
+
+
+            System.Console.WriteLine($"{new string(' ', 8)}  {"State",-32} {"Cases",20} {"Deaths",20}");
+            System.Console.WriteLine($"{Dashes(9)} {Dashes(32)} {Dashes(20)} {Dashes(20)}");
+            int i = 0;
+            foreach (var r in totalPoints.OrderByDescending(tp => tp.TotalCases))
+            {
+                System.Console.WriteLine($"{++i,8}) {r.StateName,-32} {r.TotalCases,20:#,##0} {r.TotalDeaths,20:#,##0}");
+            }
+            System.Console.WriteLine();
+        }
+
+        public static void DumpFilteredData()
+        {
+
+            #region group data by state, county ... output the results
+            var localData = queryPoints
+                .GroupBy(d => new { d.State, d.County })
+                .Select(d => d.OrderByDescending(x => x.Date).First());
+            int i = 0;
+
+            System.Console.WriteLine($"{new string(' ', 9)} {"Date",-12} {"State",-32} {"County",-32} {"Cases",20} {"Deaths",20}");
+            System.Console.WriteLine($"{Dashes(9)}{Dashes(12)} {Dashes(32)} {Dashes(32)} {Dashes(20)} {Dashes(20)}");
+            foreach (var r in localData.OrderByDescending(rr => rr.Cases).ThenBy(rr => rr.State).ThenBy(rr => rr.County))
+            {
+                System.Console.WriteLine($"{++i,8}) {r.Date,-12:MM/dd/yy} {r.State,-32} {r.County,-32} {r.Cases,20:#,##0} {r.Deaths,20:#,##0}");
+            }
+            #endregion
+        }
         public static string Dashes(int width, char pad = '-')
         {
             return new string(pad, width);
@@ -181,6 +251,7 @@ namespace ConsoleCovidExplorer
         static string sourceDataUri = string.Empty;
         static string dataFilePath = string.Empty;
         static List<DataPoint> queryPoints = null;
+        static List<StateTotal> totalPoints = null;
         static IConfiguration config = null;
         static string[] stateFilter = null;
 
@@ -199,27 +270,12 @@ namespace ConsoleCovidExplorer
             FetchData();
             FilterDataPoints();
 
-
             if (stateFilter != null && stateFilter.Any())
             {
-                System.Console.WriteLine($"States included: {string.Join(',', stateFilter)}");
+                System.Console.WriteLine($"States included: {string.Join(',', stateFilter)}\n");
             }
-
-            #region group data by state, county ... output the results
-            var localData = queryPoints
-                .GroupBy(d => new { d.State, d.County })
-                .Select(d => d.OrderByDescending(x => x.Date).First());
-
-
-            System.Console.WriteLine($"State Max Length: [{queryPoints.Max(q => q.State.Length)}], County Max Length: [{queryPoints.Max(q=>q.County.Length)}]");
-
-            System.Console.WriteLine($"{"Date",-12} {"State",-32} {"County",-32} {"Cases",20} {"Deaths",20}");
-            System.Console.WriteLine($"{Dashes(12)} {Dashes(32)} {Dashes(32)} {Dashes(20)} {Dashes(20)}");
-            foreach (var r in localData.OrderByDescending(rr => rr.Cases).ThenBy(rr => rr.State).ThenBy(rr => rr.County))
-            {
-                System.Console.WriteLine($"{r.Date,-12:MM/dd/yy} {r.State,-32} {r.County,-32} {r.Cases,20:#,##0} {r.Deaths,20:#,##0}");
-            }
-            #endregion
+            DumpStateTotals();
+            DumpFilteredData();
 
             // Done!!
             if (!Console.IsOutputRedirected)
@@ -227,7 +283,7 @@ namespace ConsoleCovidExplorer
 
                 Timer exitTimer = new Timer(int.Parse(config["userPrefs:exitDelayInMilliseconds"]));
 
-                exitTimer.Elapsed += (sender,e) => Environment.Exit(0);
+                exitTimer.Elapsed += (sender, e) => Environment.Exit(0);
                 exitTimer.Enabled = true;
                 exitTimer.Start();
 
