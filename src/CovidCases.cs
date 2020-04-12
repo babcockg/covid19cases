@@ -257,6 +257,13 @@ namespace ConsoleCovidExplorer
 
         public static int Main(string[] args)
         {
+            TextWriter tw = null;
+            if (args.Contains("-redirect"))
+            {
+                tw = Console.Out;
+                Console.SetOut(new StreamWriter("output.txt"));
+            }
+
             CreateConfiguration();
             ReadConfiguration();
             dataFilePath = GetPublishedData(sourceDataUri, cacheFileName);
@@ -277,6 +284,13 @@ namespace ConsoleCovidExplorer
             DumpStateTotals();
             DumpFilteredData();
 
+            if (tw != null)
+            {
+                Console.Out.Flush();
+                Console.Out.Close();
+
+                Console.SetOut(tw);
+            }
             // Done!!
             if (!Console.IsOutputRedirected)
             {
