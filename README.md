@@ -21,6 +21,6 @@ If the array is empty, then **all** states and counties are listed.
 Restrict output to just the states of Kansas and Missouri
 ```
 "stateFilter": [
-    "Kansas",
+    "Kansas", 
     "Missouri"
 ]
